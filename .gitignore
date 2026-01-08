@@ -1,0 +1,39 @@
+# Android Studio / IntelliJ
+*.iml
+*.ipr
+*.iws
+
+.idea/
+!.idea/codeStyles/
+!.idea/inspectionProfiles/
+
+# Gradle
+.gradle/
+build/
+**/build/
+
+# Local configuration (contains machine-specific paths)
+local.properties
+
+# Mac/Windows/Linux noise
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# External native build
+.externalNativeBuild/
+.cxx/
+
+# Kotlin/Java build caches
+kotlin/
+**/kotlin/
+
+# Android Studio captures
+captures/
+
+# Logs
+*.log
+
+# Keystore files (don’t commit signing keys)
+*.jks
+*.keystore
