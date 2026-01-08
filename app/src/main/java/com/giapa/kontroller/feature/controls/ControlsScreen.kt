@@ -1,5 +1,9 @@
 package com.giapa.kontroller.feature.controls
 
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,9 +29,14 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.giapa.kontroller.ui.components.Rounded
 import com.giapa.kontroller.ui.components.primaryButtonColors
@@ -38,13 +47,14 @@ fun ControlsRoute(
     viewModel: ControlsViewModel = viewModel(),
 ) {
     val state by viewModel.state.collectAsState()
+    val context = LocalContext.current
 
     ControlsScreen(
         state = state,
         onNavigateUp = onNavigateUp,
         onBack = viewModel::onBack,
         onForward = viewModel::onForward,
-        onMic = viewModel::onMic,
+        onMic = { viewModel.onMicToggle(context) },
     )
 }
 
@@ -59,6 +69,40 @@ fun ControlsScreen(
     modifier: Modifier = Modifier,
 ) {
     val navigateUp = onNavigateUp
+
+    val context = LocalContext.current
+    var micPermissionError by remember { mutableStateOf<String?>(null) }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { granted ->
+            if (granted) {
+                micPermissionError = null
+                onMic()
+            } else {
+                micPermissionError = "Microphone permission is required for voice control"
+            }
+        },
+    )
+
+    fun toggleMicWithPermission() {
+        if (state.isListening) {
+            onMic()
+            return
+        }
+
+        val granted = ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.RECORD_AUDIO,
+        ) == PackageManager.PERMISSION_GRANTED
+
+        if (granted) {
+            micPermissionError = null
+            onMic()
+        } else {
+            permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+        }
+    }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -112,16 +156,16 @@ fun ControlsScreen(
             Spacer(Modifier.height(18.dp))
 
             Button(
-                onClick = onMic,
+                onClick = { toggleMicWithPermission() },
                 modifier = Modifier.fillMaxWidth(),
                 shape = Rounded.Button,
                 colors = primaryButtonColors(),
             ) {
                 Icon(Icons.Default.Mic, contentDescription = null)
-                Text("Mic")
+                Text(if (state.isListening) "Stop" else "Mic")
             }
 
-            val err = state.errorMessage
+            val err = state.errorMessage ?: micPermissionError
             if (err != null) {
                 Spacer(Modifier.height(12.dp))
                 Text(err, color = MaterialTheme.colorScheme.error)
