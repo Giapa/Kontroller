@@ -3,14 +3,14 @@ package com.giapa.kontroller.feature.controls
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.giapa.kontroller.domain.ControllerClient
-import com.giapa.kontroller.domain.FakeControllerClient
+import com.giapa.kontroller.domain.HttpControllerClient
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class ControlsViewModel(
-    private val client: ControllerClient = FakeControllerClient(),
+    private val client: ControllerClient = HttpControllerClient(),
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ControlsUiState())
@@ -33,4 +33,3 @@ class ControlsViewModel(
         }
     }
 }
-

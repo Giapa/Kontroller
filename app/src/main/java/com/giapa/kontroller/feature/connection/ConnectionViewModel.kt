@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.giapa.kontroller.domain.ConnectionRepository
 import com.giapa.kontroller.domain.DefaultConnectionRepository
+import com.giapa.kontroller.domain.ConnectionSession
 import com.giapa.kontroller.util.IpAddressValidator
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -38,6 +39,7 @@ class ConnectionViewModel(
             _state.update { it.copy(isConnecting = false) }
             result
                 .onSuccess {
+                    ConnectionSession.endpoint = endpoint
                     _events.trySend(ConnectionEvent.ShowPopup("Success", "Connected to KOReader"))
                     _events.trySend(ConnectionEvent.Connected)
                 }
