@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -15,6 +16,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -29,12 +33,44 @@ fun ConnectionRoute(
 ) {
     val state by viewModel.state.collectAsState()
 
+    var popup by remember { mutableStateOf<ConnectionEvent.ShowPopup?>(null) }
+    var pendingNavigate by remember { mutableStateOf(false) }
+
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
             when (event) {
-                ConnectionEvent.Connected -> onConnected()
+                ConnectionEvent.Connected -> pendingNavigate = true
+                is ConnectionEvent.ShowPopup -> popup = event
             }
         }
+    }
+
+    if (popup != null) {
+        val current = popup!!
+        AlertDialog(
+            onDismissRequest = {
+                popup = null
+                if (pendingNavigate && current.title == "Success") {
+                    pendingNavigate = false
+                    onConnected()
+                }
+            },
+            title = { Text(current.title) },
+            text = { Text(current.message) },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        popup = null
+                        if (pendingNavigate && current.title == "Success") {
+                            pendingNavigate = false
+                            onConnected()
+                        }
+                    },
+                ) {
+                    Text("OK")
+                }
+            },
+        )
     }
 
     ConnectionScreen(
@@ -97,10 +133,11 @@ fun ConnectionScreen(
         Button(
             onClick = onScanClick,
             modifier = Modifier.fillMaxWidth(),
+            enabled = !state.isConnecting,
             shape = Rounded.Button,
             colors = primaryButtonColors(),
         ) {
-            Text("Scan")
+            Text(if (state.isConnecting) "Scanning…" else "Scan")
         }
     }
 }
