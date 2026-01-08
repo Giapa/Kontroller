@@ -27,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -40,6 +41,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.giapa.kontroller.ui.components.Rounded
 import com.giapa.kontroller.ui.components.primaryButtonColors
+import com.giapa.kontroller.util.KeepScreenOnWithTimeoutEffect
 
 @Composable
 fun ControlsRoute(
@@ -48,6 +50,18 @@ fun ControlsRoute(
 ) {
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
+
+    KeepScreenOnWithTimeoutEffect(
+        timeoutMs = ControlsViewModel.KEEP_SCREEN_ON_MS,
+        bumpKey = state.keepScreenOnBump,
+    )
+
+    DisposableEffect(Unit) {
+        viewModel.onControlsShown(context)
+        onDispose {
+            viewModel.onControlsHidden()
+        }
+    }
 
     ControlsScreen(
         state = state,

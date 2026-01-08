@@ -4,4 +4,5 @@ data class ControlsUiState(
     val lastAction: String? = null,
     val errorMessage: String? = null,
     val isListening: Boolean = false,
+    val keepScreenOnBump: Long = 0L,
 )
