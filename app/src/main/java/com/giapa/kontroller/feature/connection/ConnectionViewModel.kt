@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.giapa.kontroller.domain.ConnectionRepository
 import com.giapa.kontroller.domain.FakeConnectionRepository
+import com.giapa.kontroller.util.IpAddressValidator
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -27,8 +28,8 @@ class ConnectionViewModel(
 
     fun onConnectClick() {
         val endpoint = state.value.endpoint.trim()
-        if (endpoint.isBlank()) {
-            _state.update { it.copy(errorMessage = "Please enter an address") }
+        if (!IpAddressValidator.isValidEndpoint(endpoint)) {
+            _state.update { it.copy(errorMessage = "Enter a valid IP address (e.g. 192.168.1.10 or 192.168.1.10:8080)") }
             return
         }
         viewModelScope.launch {
@@ -51,4 +52,3 @@ class ConnectionViewModel(
 sealed interface ConnectionEvent {
     data object Connected : ConnectionEvent
 }
-
