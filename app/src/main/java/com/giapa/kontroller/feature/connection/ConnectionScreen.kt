@@ -11,7 +11,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -95,13 +94,13 @@ fun ConnectionScreen(
 
         Spacer(Modifier.height(8.dp))
 
-        TextButton(
+        Button(
             onClick = onScanClick,
             modifier = Modifier.fillMaxWidth(),
             shape = Rounded.Button,
+            colors = primaryButtonColors(),
         ) {
             Text("Scan")
         }
     }
 }
-
