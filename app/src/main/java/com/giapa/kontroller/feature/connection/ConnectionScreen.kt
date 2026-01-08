@@ -1,15 +1,20 @@
 package com.giapa.kontroller.feature.connection
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -78,6 +83,7 @@ fun ConnectionRoute(
         onEndpointChange = viewModel::onEndpointChange,
         onConnectClick = viewModel::onConnectClick,
         onScanClick = viewModel::onScanClick,
+        onScanResultClick = viewModel::onScanResultClick,
     )
 }
 
@@ -87,6 +93,7 @@ fun ConnectionScreen(
     onEndpointChange: (String) -> Unit,
     onConnectClick: () -> Unit,
     onScanClick: () -> Unit,
+    onScanResultClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -133,11 +140,39 @@ fun ConnectionScreen(
         Button(
             onClick = onScanClick,
             modifier = Modifier.fillMaxWidth(),
-            enabled = !state.isConnecting,
+            enabled = !state.isConnecting && !state.isScanning,
             shape = Rounded.Button,
             colors = primaryButtonColors(),
         ) {
-            Text(if (state.isConnecting) "Scanning…" else "Scan")
+            Text(if (state.isScanning) "Scanning…" else "Scan")
+        }
+
+        if (state.scanResults.isNotEmpty()) {
+            Spacer(Modifier.height(16.dp))
+            Text(
+                text = "Found devices:",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+            )
+            Spacer(Modifier.height(8.dp))
+
+            LazyColumn(
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                items(state.scanResults) { ip ->
+                    OutlinedCard(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp)
+                            .clickable { onScanResultClick(ip) },
+                        shape = Rounded.Field,
+                    ) {
+                        Row(modifier = Modifier.padding(12.dp)) {
+                            Text(text = "$ip:8080")
+                        }
+                    }
+                }
+            }
         }
     }
 }

@@ -53,36 +53,40 @@ class ConnectionViewModel(
     }
 
     fun onScanClick() {
-        val endpoint = state.value.endpoint.trim()
-        if (!IpAddressValidator.isValidEndpoint(endpoint)) {
-            _events.trySend(
-                ConnectionEvent.ShowPopup(
-                    "Connection error",
-                    "Enter a valid IP address (e.g. 192.168.1.10)",
-                ),
-            )
-            return
-        }
-
         viewModelScope.launch {
-            _state.update { it.copy(isConnecting = true, errorMessage = null) }
-            val result = repo.scan(endpoint)
-            _state.update { it.copy(isConnecting = false) }
+            _state.update { it.copy(isScanning = true, scanResults = emptyList(), errorMessage = null) }
+
+            val result = repo.scanNetworkFor8080()
+
+            _state.update { it.copy(isScanning = false) }
 
             result
-                .onSuccess {
-                    _events.trySend(ConnectionEvent.ShowPopup("Success", "KOReader detected"))
-                    _events.trySend(ConnectionEvent.Connected)
+                .onSuccess { ips ->
+                    _state.update { it.copy(scanResults = ips) }
+                    if (ips.isEmpty()) {
+                        _events.trySend(
+                            ConnectionEvent.ShowPopup(
+                                "No devices found",
+                                "No KOReader instances detected on port 8080.",
+                            ),
+                        )
+                    }
                 }
                 .onFailure { e ->
                     _events.trySend(
                         ConnectionEvent.ShowPopup(
-                            "Connection error",
-                            e.message ?: "Could not connect to KOReader",
+                            "Scan error",
+                            e.message ?: "Failed to scan network",
                         ),
                     )
                 }
         }
+    }
+
+    fun onScanResultClick(ip: String) {
+        _state.update { it.copy(endpoint = ip, errorMessage = null) }
+        // Reuse connect flow.
+        onConnectClick()
     }
 }
 
