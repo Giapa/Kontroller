@@ -5,28 +5,8 @@ object IpAddressValidator {
     fun isValidEndpoint(input: String): Boolean {
         val trimmed = input.trim()
         if (trimmed.isEmpty()) return false
-
-        val (host, port) = splitHostPort(trimmed) ?: return false
-        if (!isValidIpv4(host)) return false
-
-        if (port != null) {
-            val p = port.toIntOrNull() ?: return false
-            if (p !in 1..65535) return false
-        }
-
-        return true
-    }
-
-    private fun splitHostPort(value: String): Pair<String, String?>? {
-        val first = value.indexOf(':')
-        if (first == -1) return value to null
-        if (value.indexOf(':', startIndex = first + 1) != -1) return null
-
-        val host = value.substring(0, first)
-        val port = value.substring(first + 1)
-
-        if (host.isBlank() || port.isBlank()) return null
-        return host to port
+        if (':' in trimmed) return false
+        return isValidIpv4(trimmed)
     }
 
     private fun isValidIpv4(host: String): Boolean {
@@ -42,4 +22,3 @@ object IpAddressValidator {
         }
     }
 }
-

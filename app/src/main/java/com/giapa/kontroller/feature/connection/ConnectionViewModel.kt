@@ -29,7 +29,7 @@ class ConnectionViewModel(
     fun onConnectClick() {
         val endpoint = state.value.endpoint.trim()
         if (!IpAddressValidator.isValidEndpoint(endpoint)) {
-            _state.update { it.copy(errorMessage = "Enter a valid IP address (e.g. 192.168.1.10 or 192.168.1.10:8080)") }
+            _state.update { it.copy(errorMessage = "Enter a valid IP address (e.g. 192.168.1.10)") }
             return
         }
         viewModelScope.launch {
