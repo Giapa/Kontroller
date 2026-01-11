@@ -13,9 +13,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -125,7 +125,7 @@ fun ControlsScreen(
                 title = { Text("Controls") },
                 navigationIcon = {
                     IconButton(onClick = navigateUp) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -152,7 +152,7 @@ fun ControlsScreen(
                     shape = Rounded.Button,
                     colors = primaryButtonColors(),
                 ) {
-                    Icon(Icons.Default.KeyboardArrowLeft, contentDescription = null)
+                    Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = null)
                     Text("Back")
                 }
 
@@ -163,7 +163,7 @@ fun ControlsScreen(
                     colors = primaryButtonColors(),
                 ) {
                     Text("Forward")
-                    Icon(Icons.Default.KeyboardArrowRight, contentDescription = null)
+                    Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null)
                 }
             }
 
