@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <issue id="InsecureBaseConfiguration" severity="informational">
+        <ignore path="src/main/res/xml/network_security_config.xml" />
+    </issue>
+</lint>
+
