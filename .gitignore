@@ -37,3 +37,4 @@ captures/
 # Keystore files (don’t commit signing keys)
 *.jks
 *.keystore
+keystore.properties
